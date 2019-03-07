@@ -4,6 +4,7 @@ class MS2007(object):
         self.x = 0
         self.y = 0
         self.t = 0
+        self.update(0.0);
     def update(self,dt):
         self.t+=dt
         self.x=self.A1x*cos(self.hx*self.w*self.t)+self.A2x*cos(self.hx*self.w*self.t-self.phx)+self.ox

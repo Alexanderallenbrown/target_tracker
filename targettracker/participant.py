@@ -49,6 +49,7 @@ class Participant(object):
         self.oldd = 0
         
         self.go = False
+        self.ttc = -1000
     
     def measureTarget(self,target,dt):
         """ measures the target properties needed for prediction"""
@@ -60,6 +61,7 @@ class Participant(object):
         self.d = ((self.x-self.tx)**2+(self.y-self.ty)**2)**0.5
         self.ddot = (self.d-self.oldd)/dt
         self.oldd = self.d
+        
     
     def predictTarget(self):
         """predicts future location of the target based on some model of target motion... start with constant velocity"""
@@ -100,23 +102,23 @@ class Participant(object):
         self.x,self.xdot,self.y,self.ydot=x
     
     def update(self,target,dt):
+        
+        self.measureTarget(target,dt)
+        #if enough time has passed, make another prediction
+        
+        # if(self.ttc<self.ttcthresh):
+        #     print("gon' get him: "+str(self.ttc))
+        if(not self.go):
+            self.predictTarget()
         if(self.go):
             self.t+=dt
-            self.measureTarget(target,dt)
-            #if enough time has passed, make another prediction
-            #print(self.t-self.lastpredtime)
             self.calcTTC()
-            # if(self.ttc<self.ttcthresh):
-            #     print("gon' get him: "+str(self.ttc))
             if(((self.t-self.lastpredtime)>=self.reactiontime) and ((self.ttc>self.ttcthresh) or (self.ttc<0))):
                 #print("predicting new target pos at time lag of: "+str(self.t-self.lastpredtime))
                 self.predictTarget()
-                
-                #print(self.predX,self.predY)
-            #now that we have updated where the target is, move towards it
             self.rk_update(dt)
-            if(self.d<self.capturethresh):
-                self.captured = True
+        if(self.d<self.capturethresh):
+            self.captured = True
 
         
     
